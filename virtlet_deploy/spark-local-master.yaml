@@ -1,0 +1,33 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: spark-master
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: spark-master
+      labels:
+        case: spark-master
+      annotations:
+        kubernetes.io/target-runtime: virtlet
+        VirtletDiskDriver: virtio
+        VirtletCloudInitUserDataScript: |
+          run:
+            - POST: /env/PORT
+              val: 7077
+            - POST: /env/UIPORT
+              val: 8080
+            - PUT: /app/
+              command: "runscript /run/master"
+    spec:
+      affinity: {"nodeAffinity": {"requiredDuringSchedulingIgnoredDuringExecution": {"nodeSelectorTerms": [{"matchExpressions": [{"key": "extraRuntime", "operator": "In", "values": ["virtlet"]}]}]}}}
+      containers:
+        - name: spark-master
+          image: virtlet/image-service.kube-system/spark.qemu
+          resources:
+            limits:
+              memory: 1024Mi
+          ports:
+          - name: app-port
+            containerPort: 7077

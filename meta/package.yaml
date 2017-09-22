@@ -1,0 +1,6 @@
+name: osv-spark
+title: Spark in OSv
+author: miha
+require:
+- osv.cloud-init
+- apache.spark-2.1.1
