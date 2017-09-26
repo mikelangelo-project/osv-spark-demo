@@ -1,0 +1,6 @@
+runtime: native
+
+config_set:
+  default:
+    base: "osv.bootstrap:sleep"
+config_set_default: default
