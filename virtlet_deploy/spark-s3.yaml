@@ -1,0 +1,118 @@
+
+#
+# Master node (OSv)
+#
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: spark-master
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: spark-master
+      labels:
+        case: spark-master
+      annotations:
+        kubernetes.io/target-runtime: virtlet
+        VirtletDiskDriver: virtio
+        VirtletCloudInitUserDataScript: |
+          run:
+            - POST: /env/PORT
+              val: 7077
+            - POST: /env/UIPORT
+              val: 8080
+            - PUT: /app/
+              command: "runscript /run/master"
+    spec:
+      affinity: {"nodeAffinity": {"requiredDuringSchedulingIgnoredDuringExecution": {"nodeSelectorTerms": [{"matchExpressions": [{"key": "extraRuntime", "operator": "In", "values": ["virtlet"]}]}]}}}
+      containers:
+        - name: spark-master
+          image: virtlet/s3.amazonaws.com/osv-microservice-demo/spark.qemu
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              memory: 1024Mi
+          ports:
+          - name: app-port
+            containerPort: 7077
+
+---
+
+#
+# k8s Service for Master node to make Master addressible as "spark-master.default"
+#
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-master
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    case: spark-master
+  ports:
+  - protocol: TCP
+    port: 7077
+    targetPort: app-port
+
+---
+
+#
+# Worker node (OSv)
+#
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: spark-worker
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: spark-worker
+      labels:
+        case: spark-worker
+      annotations:
+        kubernetes.io/target-runtime: virtlet
+        VirtletDiskDriver: virtio
+        VirtletCloudInitUserDataScript: |
+          run:
+            - POST: /env/MASTER
+              val: spark-master.default.svc.cluster.local:7077
+            - PUT: /app/
+              command: "runscript /run/worker"
+    spec:
+      affinity: {"nodeAffinity": {"requiredDuringSchedulingIgnoredDuringExecution": {"nodeSelectorTerms": [{"matchExpressions": [{"key": "extraRuntime", "operator": "In", "values": ["virtlet"]}]}]}}}
+      containers:
+        - name: spark-worker
+          image: virtlet/s3.amazonaws.com/osv-microservice-demo/spark.qemu
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              memory: 3000Mi
+
+---
+
+#
+# Driver node (Docker container)
+#
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: spark-driver
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: spark-driver
+      labels:
+        case: spark-driver
+    spec:
+      containers:
+        - name: spark-driver
+          image: mikelangelo/spark-driver
+          imagePullPolicy : IfNotPresent
