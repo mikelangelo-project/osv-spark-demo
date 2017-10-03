@@ -46,3 +46,11 @@ $# ./bin/spark-submit \
 Notice how we're referencing spark-master not by IP, but by k8s Service name
 "spark-master.default.svc.cluster", which we've previously deployed. This way we don't even need
 to manually lookup the spark-master's IP, but rather leave it to the Kubernetes to do this for us.
+
+## License
+Unless specifically noted, all parts of this project are licensed under the [Apache 2.0 license](LICENSE).
+
+## Acknowledgements
+This code has been developed within the [MIKELANGELO project](https://www.mikelangelo-project.eu)
+(no. 645402), started in January 2015, and co-funded by the European Commission under the
+H2020-ICT-07-2014: Advanced Cloud Infrastructures and Services programme.
