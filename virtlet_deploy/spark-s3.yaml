@@ -28,7 +28,7 @@ spec:
       labels:
         case: spark-master
       annotations:
-        kubernetes.io/target-runtime: virtlet
+        kubernetes.io/target-runtime: virtlet.cloud
         VirtletDiskDriver: virtio
         VirtletCloudInitUserDataScript: |
           run:
@@ -42,7 +42,7 @@ spec:
       affinity: {"nodeAffinity": {"requiredDuringSchedulingIgnoredDuringExecution": {"nodeSelectorTerms": [{"matchExpressions": [{"key": "extraRuntime", "operator": "In", "values": ["virtlet"]}]}]}}}
       containers:
         - name: spark-master
-          image: virtlet/s3.amazonaws.com/osv-microservice-demo/spark.qemu
+          image: virtlet.cloud/s3.amazonaws.com/osv-microservice-demo/spark.qemu
           imagePullPolicy: IfNotPresent
           resources:
             limits:
@@ -89,7 +89,7 @@ spec:
       labels:
         case: spark-worker
       annotations:
-        kubernetes.io/target-runtime: virtlet
+        kubernetes.io/target-runtime: virtlet.cloud
         VirtletDiskDriver: virtio
         VirtletCloudInitUserDataScript: |
           run:
@@ -101,7 +101,7 @@ spec:
       affinity: {"nodeAffinity": {"requiredDuringSchedulingIgnoredDuringExecution": {"nodeSelectorTerms": [{"matchExpressions": [{"key": "extraRuntime", "operator": "In", "values": ["virtlet"]}]}]}}}
       containers:
         - name: spark-worker
-          image: virtlet/s3.amazonaws.com/osv-microservice-demo/spark.qemu
+          image: virtlet.cloud/s3.amazonaws.com/osv-microservice-demo/spark.qemu
           imagePullPolicy: IfNotPresent
           resources:
             limits:
