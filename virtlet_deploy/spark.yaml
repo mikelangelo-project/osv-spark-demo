@@ -117,6 +117,8 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: spark-driver
+  labels:
+    case: spark-driver
 spec:
   replicas: 1
   template:
